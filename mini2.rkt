@@ -77,7 +77,8 @@
          (== `(,a . ,res) out)
          (appendo d s res))])))
 
-; (run* (q) (appendo '(a b c) '(d e) q))
+(printf "testing appendo\n")
+(run* (q) (appendo q '(a b c) '(a b c) ))
 
 ;(define reverso
 ;  (lambda (xs out)
@@ -97,7 +98,7 @@
 
 (define reverso_helper
   (lambda (xs acc out)
-    (printf "reverso_helper: ~a ~a ~a~n" xs acc out)
+    ;(printf "reverso_helper: ~a ~a ~a~n" xs acc out)
     (conde
       [(== '() xs) (== acc out)]
       [(fresh (h t)
@@ -109,9 +110,14 @@
 
 (define reverso (lambda (xs ys) (reverso_helper xs `() ys)) )
 
+(printf "calling reverso with run 1\n")
 ; we call run 1 because there is only 1 solution and if we call with >1 it hangs
-(run 1 (q) (reverso `(a b c)  q) )
-(run 1 (q) (reverso q '(a b c)))     
+(run 1 (q) (reverso '(a b c)  q) )
+(run 1 (q) (reverso q '(a b c)))
+
+(printf "calling reverso with run*\n")
+(run* (q) (reverso '(a b c)  q) )   ; works
+; (run* (q) (reverso q '(a b c) ) )   ; hangs
 
 (define reverso1
   (lambda (a b)
@@ -128,11 +134,21 @@
     )
   )
 )
-; this finishes too
-(run 1 (q) (reverso1 q `(a b c) ) )
-(run 1 (q) (reverso1 `(a b c) q) )
 
-; so, in minikanren both implementations of reverso work
+(printf "calling reverso1 with run1\n")
+; this finishes too
+(run 1 (q) (reverso1 q '(a b c) ) )
+(run 1 (q) (reverso1 '(a b c) q) )
+
+(printf "calling reverso1 with run*\n")
+; this finishes too
+(run* (q) (reverso1 q '(a b c) ) )    ; works
+; (run* (q) (reverso1 '(a b c) q) )     ; hangs
+
+; so, in minikanren both implementations of reverso work. somehow....
 
 ;(run* (q) (conso q '(2 3) '(2 3)) )
 ;(run* (q) (eq q '(2 3)) )
+
+
+
