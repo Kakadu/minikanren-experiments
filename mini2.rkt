@@ -77,8 +77,8 @@
          (== `(,a . ,res) out)
          (appendo d s res))])))
 
-(printf "testing appendo\n")
-(run* (q) (appendo q '(a b c) '(a b c) ))
+;(printf "testing appendo\n")
+;(run* (q) (appendo q '(a b c) '(a b c) ))
 
 ;(define reverso
 ;  (lambda (xs out)
@@ -95,12 +95,35 @@
 ;)
 (define conso (lambda (h tl out) (== (cons h tl) out)))
 (define eq (lambda (a b) (== a b)))
+(define list_eq_naive
+  (lambda (xs ys)
+    ;(printf "list_eq_naive: ~a ~a~n" xs ys)
+    (== ys xs)))
+  
+(define list_eq
+  (lambda (xs ys)
+    ;(printf "list_eq: ~a ~a~n" xs ys)
+    (conde [(== '() xs) (== '() ys)]
+           [(fresh (h1 t1 t2)
+                   (== `(,h1 . ,t1) xs)
+                   (== `(,h1 . ,t2) ys)
+                   (list_eq t1 t2)
+                   )])))
+
+(run 1 (q) (list_eq_naive '(1) '(1) ))
+(run 1 (q) (list_eq_naive '(1)   q ))
+(run 1 (q) (list_eq_naive '(1) `(,q) ))
+
+(run 1 (q) (list_eq '(1) '(1) ))
+(run 1 (q) (list_eq '(1)   q ))
+(run 1 (q) (list_eq '(1) `(,q) ))
 
 (define reverso_helper
   (lambda (xs acc out)
     ;(printf "reverso_helper: ~a ~a ~a~n" xs acc out)
     (conde
-      [(== '() xs) (== acc out)]
+      [(== '() xs) (list_eq acc out)]
+      ;[(== '() xs) (== acc out)]
       [(fresh (h t)
         (== `(,h . ,t) xs)
         (reverso_helper t `(,h . ,acc) out)
@@ -112,12 +135,12 @@
 
 (printf "calling reverso with run 1\n")
 ; we call run 1 because there is only 1 solution and if we call with >1 it hangs
-(run 1 (q) (reverso '(a b c)  q) )
-(run 1 (q) (reverso q '(a b c)))
+(run 1 (q) (reverso '(a b c)  q) ) ; works
+(run 1 (q) (reverso q '(a b c) ) ) ; works
 
 (printf "calling reverso with run*\n")
 (run* (q) (reverso '(a b c)  q) )   ; works
-; (run* (q) (reverso q '(a b c) ) )   ; hangs
+;(run* (q) (reverso q '(a b c) ) )   ; hangs
 
 (define reverso1
   (lambda (a b)
